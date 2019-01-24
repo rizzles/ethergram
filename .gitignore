@@ -1,0 +1,8 @@
+truffle-config.js
+web3.min.js
+test
+node_modules
+migrations
+js
+build
+package-lock.json

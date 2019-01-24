@@ -1,0 +1,1561 @@
+<!doctype html>
+<html lang=en>
+    <head>
+        <meta charset=utf-8>
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1.0, shrink-to-fit=no, user-scalable=0" name="viewport">
+        <title>Ethergram</title>
+    </head>
+    <style>
+        :root {
+            --background-900: #1F2128;
+            --background-500: #282A31;
+
+            --background-200: #8E8E93;
+            --background-100: #FFFFFF;
+
+            --orange: #FF693E;
+
+            --svg-size: 28px;
+            --stroke-width: 1.5px;
+            --p: 15px;
+            --h5: 13px;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        html, body {
+            margin: 0;
+            font-size: 16px;
+            color: white;
+            height: 100%;
+            width: 100%;
+            user-select: none;
+            position: fixed;
+        }
+        html {
+            overflow: hidden;
+        }
+        body {
+            font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,Helvetica,Arial,sans-serif;
+            display: grid;
+            grid-template-columns: 100%;
+            grid-template-rows: 50px auto 70px;
+            grid-template-areas:
+                "header"
+                "main"
+                "nav";
+        }
+        header {
+            grid-area: header;
+            background-color: var(--background-900);
+        }
+        main {
+            grid-area: main;
+            background-color: var(--background-500);
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+        }
+        nav {
+            grid-area: nav;
+            background-color: var(--background-900);
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.34/dist/web3.min.js"></script>
+    <script>
+        const camera = `<svg xmlns="http://www.w3.org/2000/svg" class="camera" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+        </svg>`;
+
+        const menu = `<svg xmlns="http://www.w3.org/2000/svg" class="menu" viewBox="0 0 25 5" width="24" height="24" stroke-width="2">
+            <g fill-rule="evenodd">
+                <circle cx="3.5" cy="2.5" r="2.5"/>
+                <circle cx="12.5" cy="2.5" r="2.5"/>
+                <circle cx="21.5" cy="2.5" r="2.5"/>
+            </g>
+        </svg>`;
+
+        const home = `<svg xmlns="http://www.w3.org/2000/svg" class="home" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>`;
+
+        const search = `<svg xmlns="http://www.w3.org/2000/svg" class="search" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>`;
+
+        const add = `<svg xmlns="http://www.w3.org/2000/svg" class="camera" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+        </svg>`;
+
+        const like = `<svg xmlns="http://www.w3.org/2000/svg" class="like" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>`;
+
+        const message = `<svg xmlns="http://www.w3.org/2000/svg" class="message" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+        </svg>`;
+
+        const send = `<svg xmlns="http://www.w3.org/2000/svg" class="send" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>`;
+
+        const favorite = `<svg xmlns="http://www.w3.org/2000/svg" class="favorite" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+        </svg>`;
+
+        const user = `<svg xmlns="http://www.w3.org/2000/svg" class="user" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+        </svg>`;
+
+        const comment = `<svg xmlns="http://www.w3.org/2000/svg" class="comment" viewBox="0 0 24 24">
+            <g fill="none" fill-rule="evenodd">
+                <circle cx="12" cy="12" r="11.5" fill="#44454C" stroke="#8E8F93"/>
+                <path fill="#909095" d="M20 18v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1c6.08 5.98 11.25 4.64 16 0z"/>
+                <circle cx="12" cy="7" r="4" fill="#909095"/>
+            </g>
+        </svg>`;
+
+        const addPost = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 98" width="98" height="98">
+            <g fill="none" fill-rule="evenodd" stroke="#979797" stroke-width="2">
+                <circle cx="49" cy="49" r="48"/>
+                <rect width="46" height="46" x="26" y="26" rx="13"/>
+                <g transform="translate(38 38)" stroke-linecap="round">
+                    <path d="M11 0v21.5"/>
+                    <path d="M0 11h21.5" stroke-linejoin="round"/>
+                </g>
+            </g>
+        </svg>`;
+
+        const logo = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 525 178" class="logo"><g fill="#FFFFFF" fill-rule="evenodd"><path fill-rule="nonzero" d="M349.39 55.76c-.53 11.29-3.03 20.11-6.13 26.34-6 12.05-18.46 15.8-23.76-1.53-2.88-9.45-3.01-25.22-.94-38.4 2.11-13.42 8-23.56 17.76-22.65 9.62.9 14.13 13.3 13.07 36.23zM187.15 125.8c-.13 18.76-3.08 35.21-9.41 40-8.99 6.77-21.06 1.68-18.56-12 2.21-12.12 12.67-24.5 28-39.61 0 0 .03 3.45-.03 11.61zm-2.45-70.16c-.55 10.28-3.22 20.61-6.13 26.45-6 12.05-18.55 15.82-23.75-1.53-3.56-11.86-2.7-27.2-.95-36.87 2.28-12.54 7.82-24.18 17.76-24.18 9.67 0 14.43 10.6 13.07 36.13zM521.42 68.2c-2.35 0-3.43 2.42-4.31 6.5-3.08 14.2-6.32 17.4-10.5 17.4-4.66 0-8.85-7.03-9.92-21.1-.85-11.05-.71-31.4.37-51.66.22-4.16-.93-8.27-12.09-12.33-4.8-1.74-11.78-4.3-15.25 4.08-9.82 23.7-13.67 42.52-14.57 50.16-.05.4-.53.48-.62-.44-.57-6.13-1.86-17.25-2.02-40.63-.03-4.56-1-8.44-6.03-11.62-3.27-2.06-13.19-5.7-16.76-1.37-3.1 3.55-6.67 13.1-10.4 24.42-3.02 9.2-5.13 15.43-5.13 15.43s.04-24.83.07-34.25c.02-3.55-2.42-4.73-3.15-4.95-3.3-.96-9.82-2.56-12.59-2.56-3.41 0-4.25 1.9-4.25 4.69 0 .36-.54 32.68-.54 55.28l.01 3.2c-1.88 10.38-8 24.48-14.66 24.48-6.67 0-9.81-5.9-9.81-32.84 0-15.71.47-22.55.7-33.92.13-6.55.4-11.57.38-12.72-.05-3.5-6.1-5.26-8.92-5.91a26.35 26.35 0 0 0-7.2-.8c-2.72.15-4.64 1.93-4.64 4.38l.01 3.82c-3.5-5.5-9.12-9.33-12.87-10.44-10.08-3-20.6-.34-28.55 10.77-6.3 8.83-10.11 18.82-11.6 33.19-1.1 10.5-.74 21.14 1.2 30.15-2.35 10.16-6.71 14.32-11.5 14.32-6.93 0-11.96-11.32-11.37-30.9.38-12.88 2.96-21.91 5.78-34.99 1.2-5.57.22-8.49-2.22-11.29-2.25-2.56-7.03-3.87-13.9-2.26-4.9 1.15-11.9 2.38-18.32 3.33 0 0 .4-1.54.7-4.26 1.67-14.26-13.82-13.1-18.77-8.55-2.95 2.72-4.96 5.93-5.72 11.7-1.2 9.15 6.26 13.46 6.26 13.46-2.45 11.21-8.46 25.86-14.65 36.45-3.32 5.67-5.86 9.87-9.14 14.34l-.03-4.98c-.07-23.57.24-42.12.38-48.8.13-6.55.4-11.45.38-12.59-.04-2.56-1.53-3.53-4.64-4.75-2.75-1.08-6-1.83-9.37-2.1-4.25-.32-6.82 1.93-6.75 4.6l.01 3.6c-3.5-5.5-9.13-9.33-12.87-10.44-10.09-2.99-20.61-.34-28.55 10.77-6.3 8.83-10.44 21.21-11.6 33.08-1.1 11.06-.93 21.1.59 28.37A66.95 66.95 0 0 0 138.55 93c11.74 18.6 34.52 14.6 45.96-1.2.54-.74 1.01-1.4 1.42-2.01l.34 9.8-10.54 9.66c-17.64 16.18-31.05 28.46-32.03 42.75-1.27 18.23 13.51 25 24.7 25.9 11.88.94 22.05-5.63 28.3-14.8 5.5-8.09 9.1-25.49 8.83-42.67-.1-6.88-.27-15.62-.41-25 6.2-7.2 13.18-16.3 19.61-26.95 7.01-11.6 14.52-27.19 18.37-39.32 0 0 6.52.06 13.49-.4 2.22-.14 2.86.31 2.45 1.94-.5 1.98-8.8 34-1.22 55.32 5.19 14.6 16.88 19.3 23.8 19.3 8.12 0 15.88-6.13 20.04-15.22.5 1.01 1.02 2 1.6 2.9 11.74 18.6 34.44 14.58 45.96-1.2a47.1 47.1 0 0 0 4.08-6.64c2.47 15.44 14.48 20.21 21.36 20.21 7.16 0 13.96-2.93 19.48-15.99.23 5.75.59 10.45 1.16 11.93.35.9 2.39 2.05 3.87 2.6 6.55 2.43 13.24 1.28 15.7.78 1.72-.35 3.06-1.72 3.24-5.27.48-9.32.19-24.98 3.01-36.61 4.74-19.53 9.17-27.1 11.26-30.85 1.18-2.1 2.5-2.45 2.55-.23.1 4.5.32 17.71 2.16 35.46 1.35 13.06 3.15 20.78 4.54 23.22 3.95 6.98 8.83 7.31 12.8 7.31 2.54 0 7.82-.7 7.35-5.14-.23-2.17.17-15.55 4.85-34.8 3.05-12.55 8.14-23.9 9.98-28.06.67-1.53.99-.32.98-.08-.39 8.65-1.26 36.95 2.27 52.42 4.78 20.97 18.6 23.32 23.41 23.32 10.29 0 18.7-7.83 21.53-28.4.68-4.96-.33-8.78-3.36-8.78h-.02z"/><g transform="translate(0 1)"><polygon points="57.24 0 56 3.893 56 116.857 57.24 118 114 87.005"/><polygon points="58 0 0 87.005 58 118 58 63.171"/><polygon points="56.705 127.444 56 128.243 56 169.086 56.705 171 114 96"/><polygon points="58 171 58 127.444 0 96"/><polygon points="56 118 114 86.908 56 63"/><polygon points="0 86.908 58 118 58 63"/></g></g></svg>`;
+    </script>
+    <script type="module">
+        //import data from '/js/Ethergram.js';
+        const ganache = false;
+
+        const data = {
+            "abi": [
+              {
+                "constant": true,
+                "inputs": [
+                  {
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "posts",
+                "outputs": [
+                  {
+                    "name": "owner",
+                    "type": "address"
+                  },
+                  {
+                    "name": "created",
+                    "type": "uint256"
+                  },
+                  {
+                    "name": "ipfs",
+                    "type": "string"
+                  },
+                  {
+                    "name": "caption",
+                    "type": "string"
+                  },
+                  {
+                    "name": "filter",
+                    "type": "string"
+                  }
+                ],
+                "payable": false,
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "constant": true,
+                "inputs": [
+                  {
+                    "name": "_index",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "getPost",
+                "outputs": [
+                  {
+                    "name": "",
+                    "type": "address"
+                  },
+                  {
+                    "name": "",
+                    "type": "uint256"
+                  },
+                  {
+                    "name": "",
+                    "type": "string"
+                  },
+                  {
+                    "name": "",
+                    "type": "string"
+                  },
+                  {
+                    "name": "",
+                    "type": "string"
+                  }
+                ],
+                "payable": false,
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "constant": false,
+                "inputs": [
+                  {
+                    "name": "ipfs",
+                    "type": "string"
+                  }
+                ],
+                "name": "addLike",
+                "outputs": [],
+                "payable": false,
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "constant": true,
+                "inputs": [
+                  {
+                    "name": "_owner",
+                    "type": "address"
+                  }
+                ],
+                "name": "getPostsByOwner",
+                "outputs": [
+                  {
+                    "name": "",
+                    "type": "uint256[]"
+                  }
+                ],
+                "payable": false,
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "constant": true,
+                "inputs": [
+                  {
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ],
+                "name": "postToOwner",
+                "outputs": [
+                  {
+                    "name": "",
+                    "type": "address"
+                  }
+                ],
+                "payable": false,
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "constant": true,
+                "inputs": [],
+                "name": "getPostsLength",
+                "outputs": [
+                  {
+                    "name": "",
+                    "type": "uint256"
+                  }
+                ],
+                "payable": false,
+                "stateMutability": "view",
+                "type": "function"
+              },
+              {
+                "constant": false,
+                "inputs": [
+                  {
+                    "name": "_ipfs",
+                    "type": "string"
+                  },
+                  {
+                    "name": "_caption",
+                    "type": "string"
+                  },
+                  {
+                    "name": "_filter",
+                    "type": "string"
+                  }
+                ],
+                "name": "createPost",
+                "outputs": [],
+                "payable": false,
+                "stateMutability": "nonpayable",
+                "type": "function"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "name": "ipfs",
+                    "type": "string"
+                  },
+                  {
+                    "indexed": false,
+                    "name": "caption",
+                    "type": "string"
+                  },
+                  {
+                    "indexed": false,
+                    "name": "owner",
+                    "type": "address"
+                  }
+                ],
+                "name": "PostCreated",
+                "type": "event"
+              },
+              {
+                "anonymous": false,
+                "inputs": [
+                  {
+                    "indexed": false,
+                    "name": "user",
+                    "type": "address"
+                  },
+                  {
+                    "indexed": false,
+                    "name": "ipfs",
+                    "type": "string"
+                  }
+                ],
+                "name": "Like",
+                "type": "event"
+              }
+          ]}
+
+        if (ganache) {
+            window.web3 = new Web3(new Web3.providers.WebsocketProvider("ws://192.168.50.11:8545"));
+        } else {
+            window.web3 = new Web3(web3.currentProvider);
+        }
+
+        // ganache
+        // window.contract = new web3.eth.Contract(data.abi, "0xc1D1A8814bfa451a8Bca3bcF1Ce843e82252CA4c");
+        // ropsten
+        window.contract = new web3.eth.Contract(data.abi, "0x07422e9cf58d7fab0de6844a2e44d39fac6f39c6");
+
+        window.state = {
+            posts: [],
+            likes: [],
+            id: '',
+            caption: '',
+            filter: 'none',
+            percent: 0,
+        };
+
+        const header = document.querySelector('ethergram-header');
+        const main = document.querySelector('main');
+        const nav = document.querySelector('ethergram-nav');
+        let url;
+        let file;
+
+        const render = (page='home', parent=document.body) => {
+            header.setAttribute('page', page);
+            main.innerHTML = `<${page}-page></${page}-page>`;
+            nav.setAttribute('page', page);
+            return;
+
+            if (window.web3.currentProvider.isToshi || typeof window.__CIPHER__ !== 'undefined' || window.web3.currentProvider.isMetaMask) {
+                header.setAttribute('page', page);
+                main.innerHTML = `<${page}-page></${page}-page>`;
+                nav.setAttribute('page', page);
+            } else {
+                main.innerHTML = `<need-mobile></need-mobile>`;
+            }
+        }
+
+        const uploadImage = () => {
+            let form = new FormData();
+            let xhr = new XMLHttpRequest();
+
+            form.append('file', file);
+            xhr.open('post', 'http://54.158.53.239:3000', true);
+
+            xhr.addEventListener("progress", (ev) => {
+                if (ev.lengthComputable) {
+                    var percentComplete = ev.loaded / ev.total * 100;
+                    state.percent = percentComplete;
+                    console.log(percentComplete);
+                }
+            });
+            xhr.addEventListener("load", () => {
+                state.id = JSON.parse(xhr.response).hash;
+            });
+            xhr.addEventListener("error", () => console.log("ERROR", xhr));
+
+            xhr.send(form);
+        }
+
+        const timeSince = (timeStamp) => {
+            let secondsPast = Math.floor(Date.now() / 1000) - timeStamp;
+            if(secondsPast < 60){
+                return parseInt(secondsPast) + 's';
+            }
+            if(secondsPast < 3600){
+                return parseInt(secondsPast/60) + 'm';
+            }
+            if(secondsPast <= 86400){
+                return parseInt(secondsPast/3600) + 'h';
+            }
+        }
+
+        async function getPosts() {
+            state.posts = [];
+            const postsLength = await contract.methods.getPostsLength().call();
+            for (let i = 0; i < postsLength; i++) {
+                state.posts.unshift(await contract.methods.getPost(i).call());
+            }
+            render();
+        }
+
+        const getLikes = () => {
+            return new Promise((resolve, reject) => {
+                contract.getPastEvents('Like', {
+                    fromBlock: 0,
+                    toBlock: 'latest',
+                })
+                .then(events => {
+                    state.likes = events.map(event => {
+                        if (event.returnValues.user == window.account) {
+                            return event.returnValues.ipfs
+                        }
+                    });
+                    resolve();
+                });
+            });
+        }
+
+        window.addEventListener('load', async () => {
+            if (ganache) {
+                window.account = '0x9AA0f4CdbbF515C751bF49EDEeaf78883ccAa533';
+            } else {
+                const accounts = await web3.eth.getAccounts();
+                window.account = accounts[0];
+            }
+
+            contract.events.PostCreated()
+            .on('data', (event) => {
+                getPosts();
+            });
+
+            contract.events.Like()
+            .on('data', (event) => {
+                getLikes();
+            });
+
+            getLikes();
+            getPosts();
+
+            /*
+            if (ganache)
+                web3.eth.sendTransaction({ from: '0x9AA0f4CdbbF515C751bF49EDEeaf78883ccAa533', to: '0x55e94a4d3a56f711bec0f09a2ef73069f131239f', value: web3.toWei(1, "Ether") },  (err, txHash) => {
+                    console.log(txHash);
+                })
+            */
+        });
+
+        customElements.define("webrtc-page", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            display: block;
+                            background-color: blue;
+                            height: 100%;
+                        }
+                        video {
+                            width: 100%;
+                            height: 100%;
+                            background-color: black;
+                        }
+                        .camera {
+                            position: relative;
+                        }
+                        svg {
+                            position: absolute;
+                            bottom: 30px;
+                            left: calc(50% - 45px);
+                        }
+                        canvas {
+                            display: none;
+                        }
+                    </style>
+                    <div class="camera">
+                        <video autoplay muted playsinline controls="true">Video stream not available.</video>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 90" width="90" height="90" class="shutter">
+                            <g fill="none" fill-rule="evenodd">
+                                <circle cx="45" cy="45" r="45" fill="#7C7C76"/>
+                                <circle cx="45" cy="45" r="30" fill="#FFFFFF"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <canvas>
+                    </canvas>
+                    <div class="output">
+                        <img alt="The screen capture will appear in this box.">
+                    </div>
+                `;
+            }
+
+            connectedCallback() {
+                var width = 320;
+                var height = 0;
+
+                var streaming = false;
+
+                const video = this.root.querySelector('video');
+                const canvas = this.root.querySelector('canvas');
+                const photo = this.root.querySelector('img');
+                const shutter = this.root.querySelector('svg');
+
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'front' }, audio: false })
+                .then(stream => {
+                    const videoTracks = stream.getVideoTracks();
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(err => {
+                    console.log("An error occurred! " + err);
+                });
+
+                shutter.addEventListener('click', (ev) => {
+                    ev.preventDefault();
+                    var context = canvas.getContext('2d');
+                    canvas.width = width;
+                    canvas.height = height;
+                    context.drawImage(video, 0, 0, width, height);
+
+                    var data = canvas.toDataURL('image/jpeg');
+                    photo.setAttribute('src', data);
+                });
+            }
+        });
+
+        customElements.define("home-page", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = state.posts.map(post =>
+                    `<ethergram-post owner="${post[0]}" created=${post[1]} ipfs="${post[2]}" caption="${post[3]}" filter="${post[4]}" likes="0"></ethergram-post>`
+                ).join(' ');
+            }
+        });
+
+        customElements.define("need-mobile", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            text-align: center;
+                            height: 100%;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                        }
+                        h4 {
+                            font-size: 22px;
+                            color: white;
+                        }
+                        p {
+                            font-size: 15px;
+                            color: white;
+                            margin: 0;
+                        }
+                    </style>
+                    <h4>Mobile Dapp Wallet</h4>
+                    <p>Please use Cipher or Coinbase Wallet</p>
+                `;
+            }
+        });
+
+        customElements.define("user-page", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            height: 100%;
+                            display: grid;
+                            grid-template-columns: auto;
+                            grid-template-rows: min-content auto;
+                        }
+                        header {
+                            display: grid;
+                            grid-template-columns: min-content auto;
+                            grid-template-rows: auto;
+                            grid-gap: 12px;
+                            padding: 20px;
+                            align-items: center;
+                            text-align: center;
+                        }
+                        nav {
+                            display: flex;
+                            justify-content: space-around;
+                        }
+                        header svg {
+                            height: 84px;
+                            width: 84px;
+                        }
+                        header p {
+                            margin: 4px 0;
+                        }
+                        header h5 {
+                            margin: 0;
+                            font-weight: 300;
+                        }
+                        section {
+                            text-align: center;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                        section h2 {
+                            font-weight: 200;
+                        }
+                        section p {
+                            font-weight: 300;
+                        }
+                        section a {
+                            display: block;
+                            margin: 28px 0;
+                            color: var(--orange);
+                        }
+                        button {
+                            all: unset;
+                            display: block;
+                            width: 100%;
+                            background-color: var(--orange);
+                            border-radius: 4px;
+                            padding: 6px;
+                            margin-top: 10px;
+                        }
+                    </style>
+                    <header>
+                        <eth-avatar address="${account}" scale=12></eth-avatar>
+                        <div>
+                            <nav>
+                                <div>
+                                    <p>0</p>
+                                    <h5>posts</h5>
+                                </div>
+                                <div>
+                                    <p class="follower">0</p>
+                                    <h5>follower</h5>
+                                </div>
+                                <div>
+                                    <p>0</p>
+                                    <h5>following</h5>
+                                </div>
+                            </nav>
+                            <button>Follow</button>
+                        </div>
+                    </header>
+                    <section>
+                        <div>
+                            ${addPost}
+                            <h2>Share photos and videos</h2>
+                            <p>When you share photos and videos, they'll<br /> appear on your profile.</p>
+                            <a>Share your first photo or video</a>
+                        </div>
+                    </section>
+                `;
+                this.root.querySelector('a').addEventListener('click', () => {
+                    render('camera');
+                });
+
+                this.root.querySelector('button').addEventListener('click', () => {
+                    contract.addFollower({ from: window.account }, (err, result) => {
+                        if (err)
+                            console.log(err);
+                        console.log(result);
+                    });
+                });
+            }
+
+            connectedCallback() {
+            }
+        });
+
+        customElements.define("like-page", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            display: block;
+                            padding: 8px;
+                        }
+                        section {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            grid-gap: 8px;
+                        }
+                        img {
+                            width: 100%;
+                            height: auto;
+                        }
+                    </style>
+                    <section>
+                    </section>
+                `;
+            }
+
+            async connectedCallback() {
+                const imgs = state.posts.map(post => {
+                    if (state.likes.includes(post[2])) {
+                        return `<img src="https://ipfs.infura.io/ipfs/${post[2]}" />`;
+                    }
+                });
+                this.root.querySelector('section').innerHTML = imgs.join('\n');
+            }
+        });
+
+        customElements.define("search-page", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            display: block;
+                            padding: 8px;
+                        }
+                        section {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            grid-gap: 8px;
+                        }
+                        img {
+                            width: 100%;
+                            height: auto;
+                        }
+                    </style>
+                    <section>
+                    </section>
+                `;
+            }
+            connectedCallback() {
+                const imgs = state.posts.map(post => `<img src="https://ipfs.infura.io/ipfs/${post[2]}" />`);
+                this.root.querySelector('section').innerHTML = imgs.join('\n');
+            }
+        });
+
+        customElements.define("add-page", class extends HTMLElement {
+            constructor() {
+                super();
+                const root = this.attachShadow({ mode: "open" });
+                root.innerHTML = `
+                    <style>
+                        :host {
+                            display: block;
+                        }
+                        section {
+
+                        }
+                    </style>
+                    <section>
+                        ${comment}
+                    </section>
+                `;
+            }
+        });
+
+        customElements.define("camera-page", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            display: block;
+                            background-color: black;
+                            height: 100%;
+                            position: relative;
+                        }
+                        img {
+                            width: 100%;
+                            height: auto;
+                        }
+                        input {
+                            display: none;
+                        }
+                        label {
+                            position: absolute;
+                            bottom: 30px;
+                            left: calc(50% - 45px);
+                        }
+                    </style>
+                    <label for="file">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 90" width="90" height="90" class="shutter">
+                            <g fill="none" fill-rule="evenodd">
+                                <circle cx="45" cy="45" r="45" fill="#7C7C76"/>
+                                <circle cx="45" cy="45" r="30" fill="#FFFFFF"/>
+                            </g>
+                        </svg>
+                    </label>
+                    <input type="file" id="file" accept="image/*" capture="camera">
+                `;
+            }
+
+            connectedCallback() {
+                const input = this.root.querySelector('input');
+                const img = this.root.querySelector('img');
+
+                input.onchange = () => {
+                    file = input.files[0];
+                    url = URL.createObjectURL(file);
+                    render('filter');
+                    // URL.revokeObjectURL(url);
+                }
+            }
+        });
+
+        customElements.define("filter-page", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            height: 100%;
+                            display: block;
+                            position: relative;
+                            overflow: hidden;
+                        }
+                        img {
+                            width: 100%;
+                            height: auto;
+                        }
+                        section {
+                            position: absolute;
+                            left: 0;
+                            bottom: 0;
+                            right: 0;
+                            background-color: var(--background-500);
+                            padding: 12px;
+                            overflow: scroll;
+                            -webkit-overflow-scrolling: touch;
+                            display: grid;
+                            grid-template-columns: repeat(5, 1fr);
+                            grid-gap: 12px;
+                        }
+                        section img {
+                            width: auto;
+                            height: 200px;
+                        }
+                        div p {
+                            font-size: 15px;
+                            color: white;
+                            text-align: center;
+                            line-height: 2em;
+                            margin: 0;
+                        }
+                        figure {
+                            margin: 0;
+                            position: relative;
+                        }
+                        figure::before, figure::after {
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            bottom: 0;
+                            width: 100%;
+                            content: '';
+                        }
+                        .none {
+                        }
+                        .none::after {
+                        }
+                        .none::before {
+                        }
+                        .kelvin::after {
+                            background: #b77d21;
+                            mix-blend-mode: overlay;
+                        }
+                        .kelvin::before {
+                            background: #382c34;
+                            mix-blend-mode: color-dodge;
+                        }
+                        .nashville {
+                            -webkit-filter: sepia(0.2) contrast(1.2) brightness(1.05) saturate(1.2);
+                            filter: sepia(0.2) contrast(1.2) brightness(1.05) saturate(1.2);
+                        }
+                        .nashville::after {
+                            background: rgba(0, 70, 150, 0.4);
+                            mix-blend-mode: lighten; }
+
+                        .nashville::before {
+                            background: rgba(247, 176, 153, 0.56);
+                            mix-blend-mode: darken;
+                        }
+                        .toaster {
+                            -webkit-filter: contrast(1.5) brightness(0.9);
+                            filter: contrast(1.5) brightness(0.9);
+                        }
+                        .toaster::after {
+                            background: -webkit-radial-gradient(circle, #804e0f, #3b003b);
+                            background: radial-gradient(circle, #804e0f, #3b003b);
+                            mix-blend-mode: screen;
+                        }
+                        .walden {
+                            -webkit-filter: brightness(1.1) hue-rotate(-10deg) sepia(0.3) saturate(1.6);
+                            filter: brightness(1.1) hue-rotate(-10deg) sepia(0.3) saturate(1.6);
+                        }
+                        .walden::after {
+                            background: #0044cc;
+                            mix-blend-mode: screen;
+                            opacity: .3;
+                        }
+                    </style>
+                    <figure class="none" id="main">
+                        <img src="${url}" />
+                    </figure>
+                    <section>
+                        <div>
+                            <p>None</p>
+                            <figure class="none">
+                                <img src="${url}" />
+                            </figure>
+                        </div>
+                        <div>
+                            <p>Kelvin</p>
+                            <figure class="kelvin">
+                                <img src="${url}" />
+                            </figure>
+                        </div>
+                        <div>
+                            <p>Nashville</p>
+                            <figure class="nashville">
+                                <img src="${url}" />
+                            </figure>
+                        </div>
+                        <div>
+                            <p>Toaster</p>
+                            <figure class="toaster">
+                                <img src="${url}" />
+                            </figure>
+                        </div>
+                        <div>
+                            <p>Walden</p>
+                            <figure class="walden">
+                                <img src="${url}" />
+                            </figure>
+                        </div>
+                    </section>
+                `;
+            }
+            connectedCallback() {
+                const main = this.root.querySelector('#main');
+                const images = this.root.querySelectorAll('section figure');
+
+                images.forEach(img => {
+                    img.addEventListener('click', () => {
+                        main.classList.remove(state.filter, state.filter);
+                        const filter = img.classList[0];
+                        state.filter = filter;
+                        main.classList.add(filter);
+                    });
+                });
+
+                uploadImage();
+            }
+        });
+
+        customElements.define("caption-page", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            display: block;
+                        }
+                        section {
+                            padding: 12px;
+                            display: grid;
+                            grid-template-columns: min-content auto;
+                            grid-gap: 8px;
+                            align-items: center;
+                        }
+                        img {
+                            width: 75px;
+                            height: auto;
+                        }
+                        input {
+                            all: unset;
+                            width: 100%;
+                            font-size: 14px;
+                        }
+                    </style>
+                    <section>
+                        <img src="${url}" />
+                        <input type="text" placeholder="Write a caption"></input>
+                    </section>
+                `;
+                this.input = this.root.querySelector('input');
+            }
+
+            async disconnectedCallback() {
+                state.caption = this.input.value;
+                await contract.methods.createPost(state.id, state.caption, state.filter).send({ from: window.account, gas: 300000 });
+                state.caption = '';
+                state.filter = '';
+                state.percent = 0;
+            }
+        });
+
+        customElements.define("send-page", class extends HTMLElement {
+            constructor() {
+                super();
+                const root = this.attachShadow({ mode: "open" });
+                root.innerHTML = `
+                    ${send}
+                `;
+            }
+        });
+
+        customElements.define("ethergram-header", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                        }
+                        section {
+                            padding: 0 12px;
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                        }
+                        svg {
+                            stroke: var(--background-200);
+                            padding: 12px 0;
+                            width: var(--svg-size);
+                            height: var(--svg-size);
+                            stroke-width: var(--stroke-width);
+                        }
+                        .logo {
+                            stroke: none;
+                            fill: white;
+                            width: auto;
+                        }
+                        .active {
+                            stroke: var(--orange);
+                        }
+                        .hide {
+                            display: none;
+                        }
+                    </style>
+                    <section>
+                        ${camera}
+                        ${logo}
+                        ${send}
+                    </section>
+                    <section class="hide">
+                        <ethergram-header-camera></ethergram-header-camera>
+                    </section>
+                    <section class="hide">
+                        <ethergram-header-filter></ethergram-header-filter>
+                    </section>
+                    <section class="hide">
+                        <ethergram-header-caption></ethergram-header-caption>
+                    </section>
+                `;
+                this.sections = this.root.querySelectorAll('section');
+                this.icons = this.root.querySelectorAll('svg');
+                this.icons.forEach(elem => {
+                    elem.addEventListener('click', () => {
+                        render(elem.classList[0]);
+                    });
+                });
+            }
+
+            static get observedAttributes() {
+                return ['page'];
+            }
+
+            attributeChangedCallback(name, oldValue, newValue) {
+                if (newValue == 'camera') {
+                    this.sections[0].classList.add('hide');
+                    this.sections[1].classList.remove('hide');
+                    this.sections[2].classList.add('hide');
+                    this.sections[3].classList.add('hide');
+                } else if (newValue == 'filter') {
+                    this.sections[0].classList.add('hide');
+                    this.sections[1].classList.add('hide');
+                    this.sections[2].classList.remove('hide');
+                    this.sections[3].classList.add('hide');
+                } else if (newValue == 'caption') {
+                    this.sections[0].classList.add('hide');
+                    this.sections[1].classList.add('hide');
+                    this.sections[2].classList.add('hide');
+                    this.sections[3].classList.remove('hide');
+                } else {
+                    this.sections[0].classList.remove('hide');
+                    this.sections[1].classList.add('hide');
+                    this.sections[2].classList.add('hide');
+                    this.sections[3].classList.add('hide');
+                    const oldElem = this.root.querySelector(`.${oldValue}`)
+                    if (oldElem) {
+                        oldElem.classList.remove('active');
+                    }
+                    const newElem = this.root.querySelector(`.${newValue}`)
+                    if (newElem) newElem.classList.add('active');
+                }
+            }
+        });
+
+        customElements.define("ethergram-header-camera", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            height: 100%;
+                            width: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                        }
+                        .active {
+                            color: var(--orange);
+                        }
+                        div {
+                            width: 50px;
+                        }
+                    </style>
+                    <p class="home active">Cancel</p>
+                    <p class="home">Photo</p>
+                    <div></div>
+                `;
+                this.root.querySelectorAll('p').forEach(elem => {
+                    elem.addEventListener('click', () => {
+                        render(elem.classList[0]);
+                    });
+                });
+            }
+        });
+
+        customElements.define("ethergram-header-filter", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            height: 100%;
+                            width: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                        }
+                        .active {
+                            color: var(--orange);
+                        }
+                    </style>
+                    <p class="home active">Cancel</p>
+                    <p class="home">Filter</p>
+                    <p class="caption active">Next</p>
+                `;
+                this.root.querySelectorAll('.active').forEach(elem => {
+                    elem.addEventListener('click', () => {
+                        render(elem.classList[0]);
+                    });
+                });
+            }
+        });
+
+        customElements.define("ethergram-header-caption", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            height: 100%;
+                            width: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                        }
+                        .active {
+                            color: var(--orange);
+                        }
+                        div {
+                            width: 50px;
+                        }
+                    </style>
+                    <div></div>
+                    <p class="home">Caption</p>
+                    <p class="home active">Share</p>
+                `;
+                this.root.querySelectorAll('.active').forEach(elem => {
+                    elem.addEventListener('click', () => {
+                        render(elem.classList[0]);
+                    });
+                });
+            }
+        });
+
+        customElements.define("ethergram-nav", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                        }
+                        svg {
+                            stroke: var(--background-200);
+                            padding: 12px;
+                            width: var(--svg-size);
+                            height: var(--svg-size);
+                            stroke-width: var(--stroke-width);
+                        }
+                        img {
+                            width: var(--svg-size);
+                            height: var(--svg-size);
+                            margin: 12px;
+                            border-radius: 50%;
+                        }
+                        .active {
+                            stroke: var(--orange);
+                        }
+                    </style>
+                    ${home}
+                    ${search}
+                    ${add}
+                    ${like}
+                    ${user}
+                `;
+                this.root.querySelectorAll('svg').forEach(elem => {
+                    elem.addEventListener('click', () => {
+                        render(elem.classList[0]);
+                    });
+                });
+            }
+
+            static get observedAttributes() {
+                return ['page'];
+            }
+
+            attributeChangedCallback(name, oldValue, newValue) {
+                const oldElem = this.root.querySelector(`.${oldValue}`)
+                if (oldElem) {
+                    oldElem.classList.remove('active');
+                }
+                const newElem = this.root.querySelector(`.${newValue}`)
+                if (newElem) newElem.classList.add('active');
+            }
+        });
+
+        customElements.define("ethergram-post", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+            }
+
+            connectedCallback() {
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            display: block;
+                        }
+                        img {
+                            width: 100%;
+                            height: auto;
+                        }
+                        p {
+                            padding: 0 12px;
+                            color: white;
+                            line-height: 1.6em;
+                            font-size: var(--p);
+                            font-weight: 600;
+                            margin: 0;
+                        }
+                        h5 {
+                            padding: 0px 12px 24px;
+                            color: var(--background-200);
+                            line-height: 1;
+                            font-size: var(--h5);
+                            font-weight: 400;
+                            margin: 0;
+                        }
+                    </style>
+                    <post-user owner="${this.getAttribute('owner')}"></post-user>
+                    <img src="https://ipfs.infura.io/ipfs/${this.getAttribute('ipfs')}" />
+                    <post-icons ipfs="${this.getAttribute('ipfs')}"></post-icons>
+                    <p class="white">${this.getAttribute('caption')}</p>
+                    <leave-comment></leave-comment>
+                    <h5>${timeSince(this.getAttribute('created'))} ago</h5>
+                `;
+            }
+        });
+
+        customElements.define("post-user", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+            }
+
+            connectedCallback() {
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            padding: 12px;
+                        }
+                        section {
+                            display: grid;
+                            grid-template-columns: auto auto;
+                            align-items: center;
+                            grid-gap: 12px;
+                        }
+                        p {
+                            color: white;
+                            margin: 0;
+                            font-size: var(--p);
+                            line-height: 1.3em;
+                            font-weight: 500;
+                            max-width: 200px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                        svg {
+                            fill: white;
+                        }
+                    </style>
+                    <section>
+                        <eth-avatar address="${this.getAttribute('owner')}" scale=6></eth-avatar>
+                        <p>${this.getAttribute('owner')}</p>
+                    </section>
+                    ${menu}
+                `;
+                this.root.querySelector('section').addEventListener('click', () => {
+                    render('user');
+                });
+            }
+        });
+
+        customElements.define("post-icons", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+            }
+
+            connectedCallback() {
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                        }
+                        svg {
+                            stroke: var(--background-200);
+                            padding: 12px;
+                            width: var(--svg-size);
+                            height: var(--svg-size);
+                            stroke-width: var(--stroke-width);
+                        }
+                        svg.active {
+                            fill: var(--orange);
+                            stroke: var(--orange);
+                        }
+                    </style>
+                    <section>
+                        ${like}
+                        ${message}
+                        ${send}
+                    </section>
+                    ${favorite}
+                `;
+
+                const favoriteIcon = this.root.querySelector('.favorite');
+                favoriteIcon.addEventListener('click', () => {
+                    favoriteIcon.classList.add('active');
+                });
+
+                const likeIcon = this.root.querySelector('.like');
+                likeIcon.addEventListener('click', async () => {
+                    likeIcon.classList.add('active');
+                    await contract.methods.addLike(this.getAttribute('ipfs')).send({ from: window.account });
+                });
+
+                if (state.likes.includes(this.getAttribute('ipfs'))) {
+                    likeIcon.classList.add('active');
+                }
+            }
+        });
+
+        customElements.define("leave-comment", class extends HTMLElement {
+            constructor() {
+                super();
+                const root = this.attachShadow({ mode: "open" });
+                root.innerHTML = `
+                    <style>
+                        :host {
+                            display: grid;
+                            grid-template-columns: min-content auto;
+                            grid-gap: 8px;
+                            align-items: center;
+                            padding: 12px;
+                        }
+                        svg {
+                            width: 24px;
+                            height: 24px;
+                        }
+                        h5 {
+                            margin: 0;
+                            font-size: var(--h5);
+                            color: var(--background-200);
+                            font-weight: 400;
+                        }
+                    </style>
+                    ${comment}
+                    <h5>Add a comment...</h5>
+                `;
+            }
+        });
+
+        customElements.define("eth-avatar", class extends HTMLElement {
+            constructor() {
+                super();
+                this.seedrand = this.seedrand.bind(this);
+                this.createColor = this.createColor.bind(this);
+                this.createImageData = this.createImageData.bind(this);
+                this.rand = this.rand.bind(this);
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        canvas {
+                            border-radius: 6px;
+                        }
+                    </style>
+                    <canvas></canvas>
+                `;
+                var canvas = this.root.querySelector('canvas');
+                var address = this.getAttribute('address').toLowerCase();
+                this.randseed = new Array(4);
+                this.seedrand(address);
+                var opts = { seed: address, size: 8, scale: this.getAttribute("scale"), color: this.createColor(), bgcolor: this.createColor(), spotcolor: this.createColor() };
+
+                var imageData = this.createImageData(opts.size);
+                var width = Math.sqrt(imageData.length);
+
+                canvas.width = canvas.height = opts.size * opts.scale;
+
+                var cc = canvas.getContext('2d');
+                cc.fillStyle = opts.bgcolor;
+                cc.fillRect(0, 0, canvas.width, canvas.height);
+                cc.fillStyle = opts.color;
+
+                for(var i = 0; i < imageData.length; i++) {
+                    // if data is 0, leave the background
+                    if(imageData[i]) {
+                        var row = Math.floor(i / width);
+                        var col = i % width;
+                        // if data is 2, choose spot color, if 1 choose foreground
+                        cc.fillStyle = (imageData[i] == 1) ? opts.color : opts.spotcolor;
+                        cc.fillRect(col * opts.scale, row * opts.scale, opts.scale, opts.scale);
+                    }
+                }
+            }
+
+            createImageData(size) {
+                var width = size; // Only support square icons for now
+                var height = size;
+
+                var dataWidth = Math.ceil(width / 2);
+                var mirrorWidth = width - dataWidth;
+
+                var data = [];
+                for(var y = 0; y < height; y++) {
+                    var row = [];
+                    for(var x = 0; x < dataWidth; x++) {
+                        // this makes foreground and background color to have a 43% (1/2.3) probability
+                        // spot color has 13% chance
+                        row[x] = Math.floor(this.rand()*2.3);
+                    }
+                    var r = row.slice(0, mirrorWidth);
+                    r.reverse();
+                    row = row.concat(r);
+
+                    for(var i = 0; i < row.length; i++) {
+                        data.push(row[i]);
+                    }
+                }
+                return data;
+            }
+
+            seedrand(seed) {
+                for (var i = 0; i < this.randseed.length; i++) {
+                    this.randseed[i] = 0;
+                }
+                for (var i = 0; i < seed.length; i++) {
+                    this.randseed[i%4] = ((this.randseed[i%4] << 5) - this.randseed[i%4]) + seed.charCodeAt(i);
+                }
+            }
+
+            createColor() {
+                //saturation is the whole color spectrum
+                var h = Math.floor(this.rand() * 360);
+                //saturation goes from 40 to 100, it avoids greyish colors
+                var s = ((this.rand() * 60) + 40) + '%';
+                //lightness can be anything from 0 to 100, but probabilities are a bell curve around 50%
+                var l = ((this.rand()+this.rand()+this.rand()+this.rand()) * 25) + '%';
+                var color = 'hsl(' + h + ',' + s + ',' + l + ')';
+                return color;
+            }
+
+            rand() {
+                var t = this.randseed[0] ^ (this.randseed[0] << 11);
+                this.randseed[0] = this.randseed[1];
+                this.randseed[1] = this.randseed[2];
+                this.randseed[2] = this.randseed[3];
+                this.randseed[3] = (this.randseed[3] ^ (this.randseed[3] >> 19) ^ t ^ (t >> 8));
+                return (this.randseed[3]>>>0) / ((1 << 31)>>>0);
+            }
+        });
+    </script>
+    <body>
+        <header>
+            <ethergram-header></ethergram-header>
+        </header>
+        <main></main>
+        <nav>
+            <ethergram-nav></ethergram-nav>
+        </nav>
+    </body>
+</html>
