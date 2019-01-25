@@ -26,9 +26,6 @@ contract Postgram {
     }
 
     function getPostsLength() public view returns (uint) {
-        if (posts.length > 8) {
-            return 8;
-        }
         return posts.length;
     }
 

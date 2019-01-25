@@ -4,6 +4,7 @@
         <meta charset=utf-8>
         <meta content="width=device-width, initial-scale=1, maximum-scale=1.0, shrink-to-fit=no, user-scalable=0" name="viewport">
         <title>Ethergram</title>
+
     </head>
     <style>
         :root {
@@ -61,7 +62,7 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.34/dist/web3.min.js"></script>
-    <script>
+    <script type="module">
         const camera = `<svg xmlns="http://www.w3.org/2000/svg" class="camera" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
             <circle cx="12" cy="13" r="4"></circle>
@@ -133,9 +134,8 @@
         </svg>`;
 
         const logo = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 525 178" class="logo"><g fill="#FFFFFF" fill-rule="evenodd"><path fill-rule="nonzero" d="M349.39 55.76c-.53 11.29-3.03 20.11-6.13 26.34-6 12.05-18.46 15.8-23.76-1.53-2.88-9.45-3.01-25.22-.94-38.4 2.11-13.42 8-23.56 17.76-22.65 9.62.9 14.13 13.3 13.07 36.23zM187.15 125.8c-.13 18.76-3.08 35.21-9.41 40-8.99 6.77-21.06 1.68-18.56-12 2.21-12.12 12.67-24.5 28-39.61 0 0 .03 3.45-.03 11.61zm-2.45-70.16c-.55 10.28-3.22 20.61-6.13 26.45-6 12.05-18.55 15.82-23.75-1.53-3.56-11.86-2.7-27.2-.95-36.87 2.28-12.54 7.82-24.18 17.76-24.18 9.67 0 14.43 10.6 13.07 36.13zM521.42 68.2c-2.35 0-3.43 2.42-4.31 6.5-3.08 14.2-6.32 17.4-10.5 17.4-4.66 0-8.85-7.03-9.92-21.1-.85-11.05-.71-31.4.37-51.66.22-4.16-.93-8.27-12.09-12.33-4.8-1.74-11.78-4.3-15.25 4.08-9.82 23.7-13.67 42.52-14.57 50.16-.05.4-.53.48-.62-.44-.57-6.13-1.86-17.25-2.02-40.63-.03-4.56-1-8.44-6.03-11.62-3.27-2.06-13.19-5.7-16.76-1.37-3.1 3.55-6.67 13.1-10.4 24.42-3.02 9.2-5.13 15.43-5.13 15.43s.04-24.83.07-34.25c.02-3.55-2.42-4.73-3.15-4.95-3.3-.96-9.82-2.56-12.59-2.56-3.41 0-4.25 1.9-4.25 4.69 0 .36-.54 32.68-.54 55.28l.01 3.2c-1.88 10.38-8 24.48-14.66 24.48-6.67 0-9.81-5.9-9.81-32.84 0-15.71.47-22.55.7-33.92.13-6.55.4-11.57.38-12.72-.05-3.5-6.1-5.26-8.92-5.91a26.35 26.35 0 0 0-7.2-.8c-2.72.15-4.64 1.93-4.64 4.38l.01 3.82c-3.5-5.5-9.12-9.33-12.87-10.44-10.08-3-20.6-.34-28.55 10.77-6.3 8.83-10.11 18.82-11.6 33.19-1.1 10.5-.74 21.14 1.2 30.15-2.35 10.16-6.71 14.32-11.5 14.32-6.93 0-11.96-11.32-11.37-30.9.38-12.88 2.96-21.91 5.78-34.99 1.2-5.57.22-8.49-2.22-11.29-2.25-2.56-7.03-3.87-13.9-2.26-4.9 1.15-11.9 2.38-18.32 3.33 0 0 .4-1.54.7-4.26 1.67-14.26-13.82-13.1-18.77-8.55-2.95 2.72-4.96 5.93-5.72 11.7-1.2 9.15 6.26 13.46 6.26 13.46-2.45 11.21-8.46 25.86-14.65 36.45-3.32 5.67-5.86 9.87-9.14 14.34l-.03-4.98c-.07-23.57.24-42.12.38-48.8.13-6.55.4-11.45.38-12.59-.04-2.56-1.53-3.53-4.64-4.75-2.75-1.08-6-1.83-9.37-2.1-4.25-.32-6.82 1.93-6.75 4.6l.01 3.6c-3.5-5.5-9.13-9.33-12.87-10.44-10.09-2.99-20.61-.34-28.55 10.77-6.3 8.83-10.44 21.21-11.6 33.08-1.1 11.06-.93 21.1.59 28.37A66.95 66.95 0 0 0 138.55 93c11.74 18.6 34.52 14.6 45.96-1.2.54-.74 1.01-1.4 1.42-2.01l.34 9.8-10.54 9.66c-17.64 16.18-31.05 28.46-32.03 42.75-1.27 18.23 13.51 25 24.7 25.9 11.88.94 22.05-5.63 28.3-14.8 5.5-8.09 9.1-25.49 8.83-42.67-.1-6.88-.27-15.62-.41-25 6.2-7.2 13.18-16.3 19.61-26.95 7.01-11.6 14.52-27.19 18.37-39.32 0 0 6.52.06 13.49-.4 2.22-.14 2.86.31 2.45 1.94-.5 1.98-8.8 34-1.22 55.32 5.19 14.6 16.88 19.3 23.8 19.3 8.12 0 15.88-6.13 20.04-15.22.5 1.01 1.02 2 1.6 2.9 11.74 18.6 34.44 14.58 45.96-1.2a47.1 47.1 0 0 0 4.08-6.64c2.47 15.44 14.48 20.21 21.36 20.21 7.16 0 13.96-2.93 19.48-15.99.23 5.75.59 10.45 1.16 11.93.35.9 2.39 2.05 3.87 2.6 6.55 2.43 13.24 1.28 15.7.78 1.72-.35 3.06-1.72 3.24-5.27.48-9.32.19-24.98 3.01-36.61 4.74-19.53 9.17-27.1 11.26-30.85 1.18-2.1 2.5-2.45 2.55-.23.1 4.5.32 17.71 2.16 35.46 1.35 13.06 3.15 20.78 4.54 23.22 3.95 6.98 8.83 7.31 12.8 7.31 2.54 0 7.82-.7 7.35-5.14-.23-2.17.17-15.55 4.85-34.8 3.05-12.55 8.14-23.9 9.98-28.06.67-1.53.99-.32.98-.08-.39 8.65-1.26 36.95 2.27 52.42 4.78 20.97 18.6 23.32 23.41 23.32 10.29 0 18.7-7.83 21.53-28.4.68-4.96-.33-8.78-3.36-8.78h-.02z"/><g transform="translate(0 1)"><polygon points="57.24 0 56 3.893 56 116.857 57.24 118 114 87.005"/><polygon points="58 0 0 87.005 58 118 58 63.171"/><polygon points="56.705 127.444 56 128.243 56 169.086 56.705 171 114 96"/><polygon points="58 171 58 127.444 0 96"/><polygon points="56 118 114 86.908 56 63"/><polygon points="0 86.908 58 118 58 63"/></g></g></svg>`;
-    </script>
-    <script type="module">
-        //import data from '/js/Ethergram.js';
+
+        // import data from '/js/Ethergram.js';
         const ganache = false;
 
         const data = {
@@ -337,18 +337,7 @@
                 "name": "Like",
                 "type": "event"
               }
-          ]}
-
-        if (ganache) {
-            window.web3 = new Web3(new Web3.providers.WebsocketProvider("ws://192.168.50.11:8545"));
-        } else {
-            window.web3 = new Web3(web3.currentProvider);
-        }
-
-        // ganache
-        // window.contract = new web3.eth.Contract(data.abi, "0xc1D1A8814bfa451a8Bca3bcF1Ce843e82252CA4c");
-        // ropsten
-        window.contract = new web3.eth.Contract(data.abi, "0x07422e9cf58d7fab0de6844a2e44d39fac6f39c6");
+            ]}
 
         window.state = {
             posts: [],
@@ -365,13 +354,12 @@
         let url;
         let file;
 
-        const render = (page='home', parent=document.body) => {
-            header.setAttribute('page', page);
-            main.innerHTML = `<${page}-page></${page}-page>`;
-            nav.setAttribute('page', page);
-            return;
-
-            if (window.web3.currentProvider.isToshi || typeof window.__CIPHER__ !== 'undefined' || window.web3.currentProvider.isMetaMask) {
+        const render = (page='home') => {
+            if (!Web3.givenProvider) {
+                main.innerHTML = `<need-mobile></need-mobile>`;
+                return;
+            }
+            if (window.web3.currentProvider.isToshi || typeof window.__CIPHER__ !== 'undefined' || window.web3.currentProvider.isMetaMask || ganache) {
                 header.setAttribute('page', page);
                 main.innerHTML = `<${page}-page></${page}-page>`;
                 nav.setAttribute('page', page);
@@ -385,7 +373,7 @@
             let xhr = new XMLHttpRequest();
 
             form.append('file', file);
-            xhr.open('post', 'http://54.158.53.239:3000', true);
+            xhr.open('post', 'https://cors.supload.com', true);
 
             xhr.addEventListener("progress", (ev) => {
                 if (ev.lengthComputable) {
@@ -394,10 +382,12 @@
                     console.log(percentComplete);
                 }
             });
+
             xhr.addEventListener("load", () => {
                 state.id = JSON.parse(xhr.response).hash;
             });
-            xhr.addEventListener("error", () => console.log("ERROR", xhr));
+
+            xhr.addEventListener("error", (err) => console.log("ERROR", xhr, err));
 
             xhr.send(form);
         }
@@ -418,7 +408,9 @@
         async function getPosts() {
             state.posts = [];
             const postsLength = await contract.methods.getPostsLength().call();
-            for (let i = 0; i < postsLength; i++) {
+            let i = postsLength >= 8 ? postsLength - 8 : 0;
+            for (i; i < postsLength; i++) {
+                console.log(i);
                 state.posts.unshift(await contract.methods.getPost(i).call());
             }
             render();
@@ -442,25 +434,43 @@
         }
 
         window.addEventListener('load', async () => {
-            if (ganache) {
-                window.account = '0x9AA0f4CdbbF515C751bF49EDEeaf78883ccAa533';
-            } else {
-                const accounts = await web3.eth.getAccounts();
-                window.account = accounts[0];
-            }
+            if (Web3.givenProvider) {
+                if (ganache) {
+                    window.web3 = new Web3(new Web3.providers.WebsocketProvider("ws://192.168.50.11:8545"));
+                    window.contract = new web3.eth.Contract(data.abi, "0xc1D1A8814bfa451a8Bca3bcF1Ce843e82252CA4c");
+                    window.account = '0x9AA0f4CdbbF515C751bF49EDEeaf78883ccAa533';
+                } else {
+                    window.web3 = new Web3(Web3.givenProvider);
+                    window.contract = new web3.eth.Contract(data.abi, "0xee0add6320659c49f7edbcc26523657bd9dee502");
+                    const accounts = await web3.eth.getAccounts();
+                    if (accounts.length === 0) {
+                        render('unlock');
+                        return;
+                    }
+                    window.account = accounts[0];
+                }
 
-            contract.events.PostCreated()
-            .on('data', (event) => {
-                getPosts();
-            });
+                const network = await web3.eth.net.getNetworkType();
+                if (network !== 'ropsten' && network !== 'private') {
+                    render('ropsten');
+                    return;
+                }
 
-            contract.events.Like()
-            .on('data', (event) => {
+                contract.events.PostCreated()
+                .on('data', (event) => {
+                    getPosts();
+                });
+
+                contract.events.Like()
+                .on('data', (event) => {
+                    getLikes();
+                });
+
                 getLikes();
-            });
-
-            getLikes();
-            getPosts();
+                getPosts();
+            } else {
+                render();
+            }
 
             /*
             if (ganache)
@@ -571,19 +581,69 @@
                             display: flex;
                             flex-direction: column;
                             justify-content: center;
+                            padding: 22px;
                         }
                         h4 {
                             font-size: 22px;
                             color: white;
                         }
                         p {
-                            font-size: 15px;
+                            font-size: 16px;
                             color: white;
                             margin: 0;
+                            line-height: 1.6em;
                         }
                     </style>
                     <h4>Mobile Dapp Wallet</h4>
-                    <p>Please use Cipher or Coinbase Wallet</p>
+                    <p>Please use Cipher or Coinbase Wallet for the best expecience</p>
+                `;
+            }
+        });
+
+        customElements.define("unlock-page", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            text-align: center;
+                            height: 100%;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            padding: 22px;
+                        }
+                        h4 {
+                            font-size: 22px;
+                            color: white;
+                        }
+                    </style>
+                    <h4>Unlock Metamask</h4>
+                `;
+            }
+        });
+
+        customElements.define("ropsten-page", class extends HTMLElement {
+            constructor() {
+                super();
+                this.root = this.attachShadow({ mode: "open" });
+                this.root.innerHTML = `
+                    <style>
+                        :host {
+                            text-align: center;
+                            height: 100%;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            padding: 22px;
+                        }
+                        h4 {
+                            font-size: 22px;
+                            color: white;
+                        }
+                    </style>
+                    <h4>Ropsten network only</h4>
                 `;
             }
         });
@@ -691,9 +751,6 @@
                         console.log(result);
                     });
                 });
-            }
-
-            connectedCallback() {
             }
         });
 
@@ -858,7 +915,7 @@
                             overflow: scroll;
                             -webkit-overflow-scrolling: touch;
                             display: grid;
-                            grid-template-columns: repeat(5, 1fr);
+                            grid-template-columns: repeat(5, min-content);
                             grid-gap: 12px;
                         }
                         section img {
@@ -1011,7 +1068,7 @@
                     </style>
                     <section>
                         <img src="${url}" />
-                        <input type="text" placeholder="Write a caption"></input>
+                        <input type="text" placeholder="Write a caption" maxlength="100"></input>
                     </section>
                 `;
                 this.input = this.root.querySelector('input');
@@ -1465,6 +1522,9 @@
                     </style>
                     <canvas></canvas>
                 `;
+            }
+
+            connectedCallback() {
                 var canvas = this.root.querySelector('canvas');
                 var address = this.getAttribute('address').toLowerCase();
                 this.randseed = new Array(4);
