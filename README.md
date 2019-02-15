@@ -3,7 +3,7 @@
 
 ![Ethergram home](https://i.supload.com/300x0/SyxVJAovXE.png)
 
-hosted on ipfs https://ipfs.infura.io/ipfs/QmaQQSmdxkYNJha857deKCxqe2KDZzsjb5WcNYMmuFQimD
+hosted on ipfs https://ipfs.infura.io/ipfs/QmRxfGXAzHesZUvnHUhAkh8fLwb7wT65PQ25uBTeiTwSK9
 
 ## Requirements
 
